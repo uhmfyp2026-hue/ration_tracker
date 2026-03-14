@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Daily Ration Tracker · Browser Only</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%);
+            min-height: 100vh;
+            padding: 12px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 5px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+
+        .storage-info {
+            background: rgba(255,255,255,0.2);
+            padding: 10px 15px;
+            border-radius: 30px;
+            margin: 15px 0;
+            color: white;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+            backdrop-filter: blur(5px);
+        }
+
+        .storage-info i {
+            margin-right: 5px;
+        }
+
+        .clear-btn {
+            background: rgba(255,255,255,0.3);
+            border: none;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+        }
+
+        .clear-btn:hover {
+            background: rgba(255,255,255,0.5);
+        }
+
+        .add-section, .filter-section {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .form-group, .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .date-input, .ration-input {
+            width: 100%;
+        }
+
+        .form-group label, .filter-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 0.9rem;
+        }
+
+        .form-group input, .filter-group input {
+            width: 100%;
+            padding: 14px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus, .filter-group input:focus {
+            outline: none;
+            border-color: #feb47b;
+            box-shadow: 0 0 0 3px rgba(254, 180, 123, 0.2);
+        }
+
+        .add-btn, .filter-btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .add-btn {
+            background: linear-gradient(135deg, #ff7e5f, #feb47b);
+            color: white;
+        }
+
+        .filter-btn {
+            background: #4a5568;
+            color: white;
+        }
+
+        .filter-btn.secondary {
+            background: #805ad5;
+        }
+
+        .rations-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .day-card {
+            background: white;
+            border-radius: 20px;
+            padding: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .day-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #edf2f7;
+        }
+
+        .day-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .day-title i {
+            font-size: 1.3rem;
+            color: #ff7e5f;
+        }
+
+        .day-title h3 {
+            font-size: 1.1rem;
+            color: #2d3748;
+        }
+
+        .day-stats {
+            font-size: 0.8rem;
+            color: #718096;
+            margin-left: 10px;
+        }
+
+        .delete-day-btn {
+            background: #fed7d7;
+            color: #c53030;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .rations-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .ration-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: #f7fafc;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s;
+        }
+
+        .ration-item:hover {
+            background: #edf2f7;
+            transform: translateX(5px);
+        }
+
+        .ration-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+            flex-wrap: wrap;
+        }
+
+        .status-toggle {
+            font-size: 1.5rem;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: white;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s;
+        }
+
+        .status-toggle.taken {
+            color: #48bb78;
+            border-color: #48bb78;
+            background: #f0fff4;
+        }
+
+        .status-toggle.remaining {
+            color: #fbbf24;
+            border-color: #fbbf24;
+            background: #fffbeb;
+        }
+
+        .ration-name {
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 1rem;
+        }
+
+        .status-badge {
+            font-size: 0.7rem;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-badge.taken {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .status-badge.remaining {
+            background: #feebc8;
+            color: #744210;
+        }
+
+        .delete-item-btn {
+            background: none;
+            border: none;
+            color: #fc8181;
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .delete-item-btn:hover {
+            background: #fff5f5;
+            color: #c53030;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            background: white;
+            border-radius: 20px;
+            grid-column: 1 / -1;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: #cbd5e0;
+            margin-bottom: 15px;
+        }
+
+        .empty-state p {
+            color: #718096;
+            font-size: 1.1rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: white;
+        }
+
+        .loading i {
+            font-size: 2.5rem;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .alert {
+            padding: 12px 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .alert.success {
+            background: #c6f6d5;
+            color: #22543d;
+            border-left: 5px solid #48bb78;
+        }
+
+        .alert.error {
+            background: #fed7d7;
+            color: #742a2a;
+            border-left: 5px solid #fc8181;
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .quick-btn {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .quick-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        .mobile-note {
+            background: rgba(0,0,0,0.1);
+            color: white;
+            padding: 10px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-size: 0.85rem;
+            text-align: center;
+        }
+
+        @media (min-width: 768px) {
+            .rations-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-utensil-spoon"></i> Pocket Ration Tracker</h1>
+            <p>Works offline · No server needed</p>
+        </div>
+
+        <div id="storageInfo" class="storage-info">
+            <span><i class="fas fa-database"></i> <span id="storageCount">0</span> items stored</span>
+            <button class="clear-btn" onclick="clearAllData()">
+                <i class="fas fa-trash-alt"></i> Clear All
+            </button>
+        </div>
+
+        <div id="alertContainer"></div>
+
+        <div class="add-section">
+            <h3 style="margin-bottom: 15px; color: #2d3748;">➕ Add New Item</h3>
+            <div class="form-group">
+                <div class="date-input">
+                    <label for="rationDate">📅 Date</label>
+                    <input type="date" id="rationDate">
+                </div>
+                <div class="ration-input">
+                    <label for="rationName">🍚 Item Name</label>
+                    <input type="text" id="rationName" placeholder="Rice, Dal, Oil, Sugar...">
+                </div>
+                <button class="add-btn" onclick="addRation()" id="addBtn">
+                    <i class="fas fa-plus-circle"></i> Add to List
+                </button>
+            </div>
+        </div>
+
+        <div class="filter-section">
+            <h3 style="margin-bottom: 15px; color: #2d3748;">🔍 Filter Options</h3>
+            <div class="filter-group">
+                <div class="date-input">
+                    <label for="filterDate">📅 Select Date</label>
+                    <input type="date" id="filterDate">
+                </div>
+                <button class="filter-btn" onclick="filterByDate()">
+                    <i class="fas fa-search"></i> Show This Date
+                </button>
+                <button class="filter-btn secondary" onclick="loadAllRations()">
+                    <i class="fas fa-calendar-alt"></i> Show All Dates
+                </button>
+            </div>
+        </div>
+
+        <div class="quick-actions">
+            <button class="quick-btn" onclick="addTodayRation('Rice')">
+                <i class="fas fa-plus"></i> Quick: Rice
+            </button>
+            <button class="quick-btn" onclick="addTodayRation('Dal')">
+                <i class="fas fa-plus"></i> Quick: Dal
+            </button>
+            <button class="quick-btn" onclick="addTodayRation('Oil')">
+                <i class="fas fa-plus"></i> Quick: Oil
+            </button>
+            <button class="quick-btn" onclick="addTodayRation('Sugar')">
+                <i class="fas fa-plus"></i> Quick: Sugar
+            </button>
+        </div>
+
+        <div id="rationsContainer" class="rations-container">
+            <div class="loading">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Loading your rations...</p>
+            </div>
+        </div>
+
+        <div class="mobile-note">
+            <i class="fas fa-sync-alt"></i> Data syncs across this browser only · 
+            <i class="fas fa-database"></i> Stored locally until cleared
+        </div>
+    </div>
+
+    <script>
+        // ==================== DATA LAYER ====================
+        // All data stored in browser's localStorage
+        let rations = [];
+
+        // Load data from localStorage on startup
+        function loadFromStorage() {
+            const saved = localStorage.getItem('rationTracker');
+            if (saved) {
+                try {
+                    rations = JSON.parse(saved);
+                } catch (e) {
+                    rations = [];
+                }
+            } else {
+                // Add some sample data for first-time users
+                const today = new Date().toISOString().split('T')[0];
+                const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+                
+                rations = [
+                    { id: generateId(), date: today, name: 'Basmati Rice', status: false },
+                    { id: generateId(), date: today, name: 'Toor Dal', status: true },
+                    { id: generateId(), date: yesterday, name: 'Cooking Oil', status: false },
+                    { id: generateId(), date: yesterday, name: 'Sugar', status: true }
+                ];
+                saveToStorage();
+            }
+            updateStorageInfo();
+        }
+
+        // Save data to localStorage
+        function saveToStorage() {
+            localStorage.setItem('rationTracker', JSON.stringify(rations));
+            updateStorageInfo();
+        }
+
+        // Generate unique ID
+        function generateId() {
+            return Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+        }
+
+        // Update storage info display
+        function updateStorageInfo() {
+            document.getElementById('storageCount').textContent = rations.length;
+        }
+
+        // ==================== UI FUNCTIONS ====================
+        // Set today's date in date inputs
+        function setTodayDates() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('rationDate').value = today;
+            document.getElementById('filterDate').value = today;
+        }
+
+        // Show alert message
+        function showAlert(message, type = 'success') {
+            const container = document.getElementById('alertContainer');
+            const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+            
+            container.innerHTML = `
+                <div class="alert ${type}">
+                    <i class="fas ${icon}"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 3000);
+        }
+
+        // Add ration
+        function addRation() {
+            const date = document.getElementById('rationDate').value;
+            const name = document.getElementById('rationName').value.trim();
+
+            if (!date) {
+                showAlert('Please select a date', 'error');
+                return;
+            }
+
+            if (!name) {
+                showAlert('Please enter an item name', 'error');
+                return;
+            }
+
+            const newRation = {
+                id: generateId(),
+                date: date,
+                name: name,
+                status: false
+            };
+
+            rations.push(newRation);
+            saveToStorage();
+            
+            document.getElementById('rationName').value = '';
+            showAlert(`✅ "${name}" added for ${formatDate(date)}`);
+            loadAllRations();
+        }
+
+        // Quick add for today
+        function addTodayRation(item) {
+            document.getElementById('rationName').value = item;
+            addRation();
+        }
+
+        // Toggle status
+        function toggleStatus(id) {
+            const ration = rations.find(r => r.id === id);
+            if (ration) {
+                ration.status = !ration.status;
+                saveToStorage();
+                loadAllRations();
+                showAlert(ration.status ? '✓ Marked as taken' : '○ Marked as remaining');
+            }
+        }
+
+        // Delete single ration
+        function deleteRation(id) {
+            if (confirm('Remove this item?')) {
+                rations = rations.filter(r => r.id !== id);
+                saveToStorage();
+                showAlert('Item removed');
+                loadAllRations();
+            }
+        }
+
+        // Delete entire day
+        function deleteDay(date) {
+            const count = rations.filter(r => r.date === date).length;
+            if (confirm(`Delete all ${count} items for ${formatDate(date)}?`)) {
+                rations = rations.filter(r => r.date !== date);
+                saveToStorage();
+                showAlert(`🗑️ All items for ${formatDate(date)} deleted`);
+                loadAllRations();
+            }
+        }
+
+        // Clear all data
+        function clearAllData() {
+            if (confirm('⚠️ Delete ALL rations? This cannot be undone!')) {
+                rations = [];
+                saveToStorage();
+                showAlert('All data cleared', 'error');
+                loadAllRations();
+            }
+        }
+
+        // Filter by date
+        function filterByDate() {
+            const date = document.getElementById('filterDate').value;
+            if (!date) {
+                showAlert('Please select a date', 'error');
+                return;
+            }
+
+            const filtered = rations.filter(r => r.date === date);
+            displayRations(filtered, `Showing: ${formatDate(date)}`);
+        }
+
+        // Load all rations
+        function loadAllRations() {
+            displayRations(rations, 'All Dates');
+        }
+
+        // Format date for display
+        function formatDate(dateString) {
+            const options = { weekday: 'short', month: 'short', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString('en-US', options);
+        }
+
+        // Display rations in UI
+        function displayRations(rationsToShow, title = '') {
+            const container = document.getElementById('rationsContainer');
+            
+            if (!rationsToShow || rationsToShow.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-clipboard-list"></i>
+                        <p>No rations found</p>
+                        <p style="font-size: 0.9rem; margin-top: 10px;">Add your first item using the form above</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Group by date
+            const grouped = rationsToShow.reduce((groups, ration) => {
+                if (!groups[ration.date]) {
+                    groups[ration.date] = [];
+                }
+                groups[ration.date].push(ration);
+                return groups;
+            }, {});
+
+            // Sort dates (newest first)
+            const sortedDates = Object.keys(grouped).sort().reverse();
+
+            let html = '';
+
+            for (const date of sortedDates) {
+                const dayRations = grouped[date];
+                const takenCount = dayRations.filter(r => r.status).length;
+                const totalCount = dayRations.length;
+
+                html += `
+                    <div class="day-card">
+                        <div class="day-header">
+                            <div class="day-title">
+                                <i class="fas fa-calendar-day"></i>
+                                <div>
+                                    <h3>${formatDate(date)}</h3>
+                                    <span class="day-stats">${takenCount}/${totalCount} taken</span>
+                                </div>
+                            </div>
+                            <button class="delete-day-btn" onclick="deleteDay('${date}')">
+                                <i class="fas fa-trash-alt"></i> Day
+                            </button>
+                        </div>
+                        <div class="rations-list">
+                `;
+
+                // Sort: untaken first, then taken
+                const sortedRations = [...dayRations].sort((a, b) => a.status - b.status);
+
+                for (const ration of sortedRations) {
+                    const statusClass = ration.status ? 'taken' : 'remaining';
+                    const statusIcon = ration.status ? 'fa-check-circle' : 'fa-times-circle';
+                    const statusText = ration.status ? 'Taken' : 'Remaining';
+
+                    html += `
+                        <div class="ration-item">
+                            <div class="ration-info">
+                                <span class="status-toggle ${statusClass}" onclick="toggleStatus('${ration.id}')">
+                                    <i class="fas ${statusIcon}"></i>
+                                </span>
+                                <span class="ration-name">${escapeHtml(ration.name)}</span>
+                                <span class="status-badge ${statusClass}">${statusText}</span>
+                            </div>
+                            <button class="delete-item-btn" onclick="deleteRation('${ration.id}')">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    `;
+                }
+
+                html += `</div></div>`;
+            }
+
+            container.innerHTML = html;
+        }
+
+        // Escape HTML to prevent XSS
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ==================== INITIALIZATION ====================
+        // Set up everything when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            setTodayDates();
+            loadFromStorage();
+            loadAllRations();
+            
+            // Add keyboard shortcut for adding
+            document.getElementById('rationName').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    addRation();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
