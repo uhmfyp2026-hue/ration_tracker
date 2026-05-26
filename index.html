@@ -316,10 +316,85 @@
   }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   .toast i { font-size: 15px; color: #97C459; }
+  .pin-overlay {
+  position: fixed; inset: 0; background: var(--accent);
+  z-index: 9999; display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+}
+.pin-box {
+  background: white; border-radius: var(--radius-lg);
+  padding: 32px 24px; width: 100%; max-width: 320px; text-align: center;
+}
+.pin-box h2 {
+  font-family: 'DM Serif Display', serif; font-size: 22px;
+  color: var(--text); margin-bottom: 6px; font-weight: 400;
+}
+.pin-box p { font-size: 13px; color: var(--text2); margin-bottom: 24px; }
+.pin-dots {
+  display: flex; justify-content: center; gap: 12px; margin-bottom: 24px;
+}
+.pin-dot {
+  width: 14px; height: 14px; border-radius: 50%;
+  border: 2px solid var(--border-strong); background: white;
+  transition: all 0.15s;
+}
+.pin-dot.filled { background: var(--accent); border-color: var(--accent); }
+.pin-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+  margin-bottom: 16px;
+}
+.pin-key {
+  padding: 16px; border: 1.5px solid var(--border-strong);
+  border-radius: var(--radius-md); background: white;
+  font-size: 20px; font-weight: 500; color: var(--text);
+  cursor: pointer; transition: all 0.1s;
+  font-family: 'DM Sans', sans-serif;
+}
+.pin-key:hover { background: var(--accent-soft); border-color: var(--accent-mid); }
+.pin-key:active { transform: scale(0.94); background: var(--accent-mid); }
+.pin-error {
+  font-size: 13px; color: var(--red); margin-bottom: 10px;
+  min-height: 20px; font-weight: 500;
+}
+.pin-link {
+  font-size: 12px; color: var(--text3); cursor: pointer;
+  text-decoration: underline; background: none; border: none;
+  font-family: 'DM Sans', sans-serif;
+}
+.pin-link:hover { color: var(--accent); }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>
+    <div class="pin-overlay" id="pinOverlay">
+  <div class="pin-box">
+    <i class="ti ti-lock" style="font-size:32px;color:var(--accent);margin-bottom:12px;display:block;"></i>
+    <h2>Ration Tracker</h2>
+    <p id="pinSubtitle">Enter your PIN to continue</p>
+    <div class="pin-dots">
+      <div class="pin-dot" id="d0"></div>
+      <div class="pin-dot" id="d1"></div>
+      <div class="pin-dot" id="d2"></div>
+      <div class="pin-dot" id="d3"></div>
+    </div>
+    <div class="pin-error" id="pinError"></div>
+    <div class="pin-grid">
+      <button class="pin-key" onclick="pinPress('1')">1</button>
+      <button class="pin-key" onclick="pinPress('2')">2</button>
+      <button class="pin-key" onclick="pinPress('3')">3</button>
+      <button class="pin-key" onclick="pinPress('4')">4</button>
+      <button class="pin-key" onclick="pinPress('5')">5</button>
+      <button class="pin-key" onclick="pinPress('6')">6</button>
+      <button class="pin-key" onclick="pinPress('7')">7</button>
+      <button class="pin-key" onclick="pinPress('8')">8</button>
+      <button class="pin-key" onclick="pinPress('9')">9</button>
+      <button class="pin-key" onclick="pinClear()" style="font-size:14px;">✕ Clear</button>
+      <button class="pin-key" onclick="pinPress('0')">0</button>
+      <button class="pin-key" onclick="pinBack()" style="font-size:18px;">⌫</button>
+    </div>
+    <button class="pin-link" onclick="resetPin()">Forgot PIN? Reset</button>
+  </div>
+</div>
 
 <div class="header">
   <div class="header-inner">
@@ -423,6 +498,74 @@
 <div class="toast" id="toast"><i class="ti ti-check"></i> <span id="toastMsg"></span></div>
 
 <script>
+    const DEFAULT_PIN = '1122';
+let pinEntry = '';
+
+function pinPress(num) {
+  if (pinEntry.length >= 4) return;
+  pinEntry += num;
+  updatePinDots();
+  if (pinEntry.length === 4) checkPin();
+}
+
+function pinBack() {
+  pinEntry = pinEntry.slice(0, -1);
+  updatePinDots();
+  document.getElementById('pinError').textContent = '';
+}
+
+function pinClear() {
+  pinEntry = '';
+  updatePinDots();
+  document.getElementById('pinError').textContent = '';
+}
+
+function updatePinDots() {
+  for (let i = 0; i < 4; i++) {
+    document.getElementById('d' + i).classList.toggle('filled', i < pinEntry.length);
+  }
+}
+
+function checkPin() {
+  const saved = localStorage.getItem('rt_pin') || DEFAULT_PIN;
+  if (pinEntry === saved) {
+    document.getElementById('pinOverlay').style.display = 'none';
+    sessionStorage.setItem('rt_unlocked', '1');
+  } else {
+    document.getElementById('pinError').textContent = 'Incorrect PIN, try again';
+    pinEntry = '';
+    updatePinDots();
+    const box = document.querySelector('.pin-box');
+    box.style.transform = 'translateX(-8px)';
+    setTimeout(() => { box.style.transform = 'translateX(8px)'; }, 80);
+    setTimeout(() => { box.style.transform = 'translateX(0)'; }, 160);
+  }
+}
+
+function resetPin() {
+  const current = prompt('Enter current PIN to reset (default is 1122):');
+  const saved = localStorage.getItem('rt_pin') || DEFAULT_PIN;
+  if (current !== saved) { alert('Wrong PIN'); return; }
+  const newPin = prompt('Enter new 4-digit PIN:');
+  if (!newPin || newPin.length !== 4 || isNaN(newPin)) {
+    alert('PIN must be exactly 4 digits'); return;
+  }
+  localStorage.setItem('rt_pin', newPin);
+  alert('PIN changed successfully!');
+}
+
+function initPin() {
+  const isSetUp = localStorage.getItem('rt_pin');
+  if (!isSetUp) {
+    localStorage.setItem('rt_pin', DEFAULT_PIN);
+    document.getElementById('pinSubtitle').textContent = 'Default PIN is 1122 — change it after login';
+  }
+  if (sessionStorage.getItem('rt_unlocked') === '1') {
+    document.getElementById('pinOverlay').style.display = 'none';
+  }
+}
+
+initPin();
   const QUICK_ITEMS = ['Rice','Dal','Oil','Sugar','Wheat','Salt','Flour','Lentils','Tea','Ghee'];
   let rations = [];
 
