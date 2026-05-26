@@ -371,7 +371,7 @@
         <label>Item name</label>
         <input type="text" id="inName" placeholder="e.g. Basmati Rice, Sugar, Oil…">
       </div>
-      <button class="add-btn" onclick="addItem()"><i class="ti ti-plus"></i> Add</button>
+      <button class="add-btn" onmousedown="event.preventDefault()" onclick="addItem()"><i class="ti ti-plus"></i> Add</button>
     </div>
   </div>
 
@@ -434,8 +434,10 @@
     const taken = document.getElementById('inStatus').value === 'true';
     if (!date || !name) { showToast('Please fill in date and item name'); return; }
     rations.push({ id: uid(), date, name, taken });
+    const input = document.getElementById('inName');
     save(); render();
-    document.getElementById('inName').value = '';
+    input.value = '';
+    input.focus();
     showToast('"' + name + '" added');
   }
 
