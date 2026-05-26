@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>Daily Ration Tracker · Browser Only</title>
+    <title>Ration Tracker · Share Your List</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -61,19 +61,41 @@
             margin-right: 5px;
         }
 
-        .clear-btn {
-            background: rgba(255,255,255,0.3);
-            border: none;
-            color: white;
-            padding: 5px 15px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            transition: all 0.3s;
+        .share-section {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
         }
 
-        .clear-btn:hover {
-            background: rgba(255,255,255,0.5);
+        .share-btn, .copy-btn, .clear-btn {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            backdrop-filter: blur(5px);
+        }
+
+        .share-btn:hover, .copy-btn:hover, .clear-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        .share-btn {
+            background: #25D366;
+            border-color: #25D366;
+        }
+
+        .copy-btn {
+            background: #3b5998;
+            border-color: #3b5998;
         }
 
         .add-section, .filter-section {
@@ -349,6 +371,7 @@
             align-items: center;
             gap: 10px;
             animation: slideDown 0.3s ease;
+            justify-content: space-between;
         }
 
         @keyframes slideDown {
@@ -368,10 +391,26 @@
             border-left: 5px solid #fc8181;
         }
 
+        .alert.info {
+            background: #bee3f8;
+            color: #2c5282;
+            border-left: 5px solid #3182ce;
+        }
+
+        .close-alert {
+            cursor: pointer;
+            font-size: 1.2rem;
+            opacity: 0.7;
+        }
+
+        .close-alert:hover {
+            opacity: 1;
+        }
+
         .quick-actions {
             display: flex;
             gap: 10px;
-            margin-top: 10px;
+            margin: 15px 0;
             flex-wrap: wrap;
         }
 
@@ -394,14 +433,95 @@
             transform: translateY(-2px);
         }
 
-        .mobile-note {
-            background: rgba(0,0,0,0.1);
-            color: white;
-            padding: 10px;
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 80vh;
+            overflow: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #edf2f7;
+        }
+
+        .modal-header h3 {
+            color: #2d3748;
+        }
+
+        .close-modal {
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: #a0aec0;
+        }
+
+        .share-text {
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: monospace;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            word-break: break-word;
+            max-height: 300px;
+            overflow: auto;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
             border-radius: 10px;
-            margin-top: 20px;
-            font-size: 0.85rem;
-            text-align: center;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .modal-btn.copy {
+            background: #3b5998;
+            color: white;
+        }
+
+        .modal-btn.share {
+            background: #25D366;
+            color: white;
+        }
+
+        .modal-btn.close {
+            background: #e2e8f0;
+            color: #4a5568;
         }
 
         @media (min-width: 768px) {
@@ -414,14 +534,26 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1><i class="fas fa-utensil-spoon"></i> Pocket Ration Tracker</h1>
-            <p>Works offline · No server needed</p>
+            <h1><i class="fas fa-utensil-spoon"></i> Ration Tracker</h1>
+            <p>Track & share your monthly rations</p>
         </div>
 
         <div id="storageInfo" class="storage-info">
             <span><i class="fas fa-database"></i> <span id="storageCount">0</span> items stored</span>
             <button class="clear-btn" onclick="clearAllData()">
                 <i class="fas fa-trash-alt"></i> Clear All
+            </button>
+        </div>
+
+        <div class="share-section">
+            <button class="copy-btn" onclick="copyListToClipboard()">
+                <i class="fas fa-copy"></i> Copy List
+            </button>
+            <button class="share-btn" onclick="shareList()">
+                <i class="fab fa-whatsapp"></i> Share List
+            </button>
+            <button class="share-btn" onclick="showShareModal()" style="background: #1DA1F2;">
+                <i class="fas fa-share-alt"></i> More Options
             </button>
         </div>
 
@@ -462,16 +594,19 @@
 
         <div class="quick-actions">
             <button class="quick-btn" onclick="addTodayRation('Rice')">
-                <i class="fas fa-plus"></i> Quick: Rice
+                <i class="fas fa-plus"></i> Rice
             </button>
             <button class="quick-btn" onclick="addTodayRation('Dal')">
-                <i class="fas fa-plus"></i> Quick: Dal
+                <i class="fas fa-plus"></i> Dal
             </button>
             <button class="quick-btn" onclick="addTodayRation('Oil')">
-                <i class="fas fa-plus"></i> Quick: Oil
+                <i class="fas fa-plus"></i> Oil
             </button>
             <button class="quick-btn" onclick="addTodayRation('Sugar')">
-                <i class="fas fa-plus"></i> Quick: Sugar
+                <i class="fas fa-plus"></i> Sugar
+            </button>
+            <button class="quick-btn" onclick="addTodayRation('Wheat')">
+                <i class="fas fa-plus"></i> Wheat
             </button>
         </div>
 
@@ -482,18 +617,37 @@
             </div>
         </div>
 
-        <div class="mobile-note">
-            <i class="fas fa-sync-alt"></i> Data syncs across this browser only · 
-            <i class="fas fa-database"></i> Stored locally until cleared
+        <div class="mobile-note" style="background: rgba(0,0,0,0.1); color: white; padding: 10px; border-radius: 10px; margin-top: 20px; font-size: 0.85rem; text-align: center;">
+            <i class="fas fa-share-alt"></i> Tap "Copy List" to share as text · Data saved locally
+        </div>
+    </div>
+
+    <!-- Share Modal -->
+    <div id="shareModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-share-alt"></i> Share Your Ration List</h3>
+                <span class="close-modal" onclick="closeShareModal()">&times;</span>
+            </div>
+            <div id="shareText" class="share-text"></div>
+            <div class="modal-actions">
+                <button class="modal-btn copy" onclick="copyFromModal()">
+                    <i class="fas fa-copy"></i> Copy
+                </button>
+                <button class="modal-btn share" onclick="shareFromModal()">
+                    <i class="fab fa-whatsapp"></i> Share
+                </button>
+                <button class="modal-btn close" onclick="closeShareModal()">
+                    Close
+                </button>
+            </div>
         </div>
     </div>
 
     <script>
         // ==================== DATA LAYER ====================
-        // All data stored in browser's localStorage
         let rations = [];
 
-        // Load data from localStorage on startup
         function loadFromStorage() {
             const saved = localStorage.getItem('rationTracker');
             if (saved) {
@@ -503,63 +657,222 @@
                     rations = [];
                 }
             } else {
-                // Add some sample data for first-time users
                 const today = new Date().toISOString().split('T')[0];
-                const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
-                
                 rations = [
                     { id: generateId(), date: today, name: 'Basmati Rice', status: false },
                     { id: generateId(), date: today, name: 'Toor Dal', status: true },
-                    { id: generateId(), date: yesterday, name: 'Cooking Oil', status: false },
-                    { id: generateId(), date: yesterday, name: 'Sugar', status: true }
                 ];
                 saveToStorage();
             }
             updateStorageInfo();
         }
 
-        // Save data to localStorage
         function saveToStorage() {
             localStorage.setItem('rationTracker', JSON.stringify(rations));
             updateStorageInfo();
         }
 
-        // Generate unique ID
         function generateId() {
             return Date.now() + '-' + Math.random().toString(36).substr(2, 9);
         }
 
-        // Update storage info display
         function updateStorageInfo() {
             document.getElementById('storageCount').textContent = rations.length;
         }
 
+        // ==================== SHARE FUNCTIONS ====================
+        function generateFormattedList() {
+            if (rations.length === 0) {
+                return "📋 No items in your ration list yet.";
+            }
+
+            // Group by date
+            const grouped = {};
+            rations.forEach(ration => {
+                if (!grouped[ration.date]) {
+                    grouped[ration.date] = [];
+                }
+                grouped[ration.date].push(ration);
+            });
+
+            const sortedDates = Object.keys(grouped).sort();
+            let output = "📋 *MY RATION LIST*\n";
+            output += "━━━━━━━━━━━━━━━━━━━━\n\n";
+
+            for (const date of sortedDates) {
+                const dayRations = grouped[date];
+                const formattedDate = new Date(date).toLocaleDateString('en-US', {
+                    weekday: 'short',
+                    month: 'short',
+                    day: 'numeric'
+                });
+                
+                const taken = dayRations.filter(r => r.status).length;
+                const remaining = dayRations.length - taken;
+                
+                output += `📅 *${formattedDate}*\n`;
+                output += `   ✓ ${taken} taken · ○ ${remaining} remaining\n`;
+                output += `   ───────────────────\n`;
+                
+                dayRations.forEach(ration => {
+                    const icon = ration.status ? "✅" : "❌";
+                    output += `   ${icon} ${ration.name}\n`;
+                });
+                output += `\n`;
+            }
+
+            output += "━━━━━━━━━━━━━━━━━━━━\n";
+            const total = rations.length;
+            const completed = rations.filter(r => r.status).length;
+            output += `📊 *Summary*: ${completed}/${total} items taken\n`;
+            output += `📱 Generated by Ration Tracker`;
+
+            return output;
+        }
+
+        function generateSimpleList() {
+            if (rations.length === 0) {
+                return "No items in ration list.";
+            }
+
+            const grouped = {};
+            rations.forEach(ration => {
+                if (!grouped[ration.date]) {
+                    grouped[ration.date] = [];
+                }
+                grouped[ration.date].push(ration);
+            });
+
+            const sortedDates = Object.keys(grouped).sort();
+            let output = "MY RATION LIST:\n\n";
+
+            for (const date of sortedDates) {
+                const dayRations = grouped[date];
+                const formattedDate = new Date(date).toLocaleDateString('en-US', {
+                    month: 'short', day: 'numeric'
+                });
+                
+                output += `📅 ${formattedDate}:\n`;
+                dayRations.forEach(ration => {
+                    const status = ration.status ? "✓ TAKEN" : "○ REMAINING";
+                    output += `   ${status} - ${ration.name}\n`;
+                });
+                output += "\n";
+            }
+
+            return output;
+        }
+
+        async function copyListToClipboard() {
+            const text = generateSimpleList();
+            try {
+                await navigator.clipboard.writeText(text);
+                showAlert("✅ List copied to clipboard! You can now paste it anywhere.", "success");
+            } catch (err) {
+                // Fallback for older browsers
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                showAlert("✅ List copied to clipboard!", "success");
+            }
+        }
+
+        async function shareList() {
+            const text = generateFormattedList();
+            
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: 'My Ration List',
+                        text: text,
+                    });
+                    showAlert("✨ Shared successfully!", "success");
+                } catch (err) {
+                    if (err.name !== 'AbortError') {
+                        showAlert("Couldn't share. Try copying instead.", "error");
+                    }
+                }
+            } else {
+                // Fallback for browsers without Web Share API
+                showShareModal();
+            }
+        }
+
+        function showShareModal() {
+            const modal = document.getElementById('shareModal');
+            const shareText = document.getElementById('shareText');
+            shareText.textContent = generateFormattedList();
+            modal.style.display = 'flex';
+        }
+
+        function closeShareModal() {
+            document.getElementById('shareModal').style.display = 'none';
+        }
+
+        async function copyFromModal() {
+            const text = document.getElementById('shareText').textContent;
+            try {
+                await navigator.clipboard.writeText(text);
+                showAlert("✅ Copied to clipboard!", "success");
+                closeShareModal();
+            } catch (err) {
+                showAlert("Failed to copy", "error");
+            }
+        }
+
+        async function shareFromModal() {
+            const text = document.getElementById('shareText').textContent;
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: 'My Ration List',
+                        text: text,
+                    });
+                    closeShareModal();
+                    showAlert("✨ Shared!", "success");
+                } catch (err) {
+                    if (err.name !== 'AbortError') {
+                        showAlert("Sharing failed", "error");
+                    }
+                }
+            } else {
+                await copyFromModal();
+                showAlert("📋 Copied! You can now paste in WhatsApp or other apps", "info");
+            }
+        }
+
         // ==================== UI FUNCTIONS ====================
-        // Set today's date in date inputs
         function setTodayDates() {
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('rationDate').value = today;
             document.getElementById('filterDate').value = today;
         }
 
-        // Show alert message
         function showAlert(message, type = 'success') {
             const container = document.getElementById('alertContainer');
-            const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+            const icons = {
+                success: 'fa-check-circle',
+                error: 'fa-exclamation-circle',
+                info: 'fa-info-circle'
+            };
             
             container.innerHTML = `
                 <div class="alert ${type}">
-                    <i class="fas ${icon}"></i>
+                    <i class="fas ${icons[type]}"></i>
                     <span>${message}</span>
+                    <span class="close-alert" onclick="this.parentElement.remove()">&times;</span>
                 </div>
             `;
             
             setTimeout(() => {
-                container.innerHTML = '';
-            }, 3000);
+                const alert = document.querySelector('.alert');
+                if (alert) alert.remove();
+            }, 4000);
         }
 
-        // Add ration
         function addRation() {
             const date = document.getElementById('rationDate').value;
             const name = document.getElementById('rationName').value.trim();
@@ -585,28 +898,24 @@
             saveToStorage();
             
             document.getElementById('rationName').value = '';
-            showAlert(`✅ "${name}" added for ${formatDate(date)}`);
+            showAlert(`✅ "${name}" added!`);
             loadAllRations();
         }
 
-        // Quick add for today
         function addTodayRation(item) {
             document.getElementById('rationName').value = item;
             addRation();
         }
 
-        // Toggle status
         function toggleStatus(id) {
             const ration = rations.find(r => r.id === id);
             if (ration) {
                 ration.status = !ration.status;
                 saveToStorage();
                 loadAllRations();
-                showAlert(ration.status ? '✓ Marked as taken' : '○ Marked as remaining');
             }
         }
 
-        // Delete single ration
         function deleteRation(id) {
             if (confirm('Remove this item?')) {
                 rations = rations.filter(r => r.id !== id);
@@ -616,18 +925,16 @@
             }
         }
 
-        // Delete entire day
         function deleteDay(date) {
             const count = rations.filter(r => r.date === date).length;
-            if (confirm(`Delete all ${count} items for ${formatDate(date)}?`)) {
+            if (confirm(`Delete all ${count} items for this day?`)) {
                 rations = rations.filter(r => r.date !== date);
                 saveToStorage();
-                showAlert(`🗑️ All items for ${formatDate(date)} deleted`);
+                showAlert(`🗑️ Day deleted`);
                 loadAllRations();
             }
         }
 
-        // Clear all data
         function clearAllData() {
             if (confirm('⚠️ Delete ALL rations? This cannot be undone!')) {
                 rations = [];
@@ -637,7 +944,6 @@
             }
         }
 
-        // Filter by date
         function filterByDate() {
             const date = document.getElementById('filterDate').value;
             if (!date) {
@@ -649,18 +955,15 @@
             displayRations(filtered, `Showing: ${formatDate(date)}`);
         }
 
-        // Load all rations
         function loadAllRations() {
             displayRations(rations, 'All Dates');
         }
 
-        // Format date for display
         function formatDate(dateString) {
             const options = { weekday: 'short', month: 'short', day: 'numeric' };
             return new Date(dateString).toLocaleDateString('en-US', options);
         }
 
-        // Display rations in UI
         function displayRations(rationsToShow, title = '') {
             const container = document.getElementById('rationsContainer');
             
@@ -675,18 +978,15 @@
                 return;
             }
 
-            // Group by date
-            const grouped = rationsToShow.reduce((groups, ration) => {
-                if (!groups[ration.date]) {
-                    groups[ration.date] = [];
+            const grouped = {};
+            rationsToShow.forEach(ration => {
+                if (!grouped[ration.date]) {
+                    grouped[ration.date] = [];
                 }
-                groups[ration.date].push(ration);
-                return groups;
-            }, {});
+                grouped[ration.date].push(ration);
+            });
 
-            // Sort dates (newest first)
             const sortedDates = Object.keys(grouped).sort().reverse();
-
             let html = '';
 
             for (const date of sortedDates) {
@@ -711,7 +1011,6 @@
                         <div class="rations-list">
                 `;
 
-                // Sort: untaken first, then taken
                 const sortedRations = [...dayRations].sort((a, b) => a.status - b.status);
 
                 for (const ration of sortedRations) {
@@ -741,7 +1040,6 @@
             container.innerHTML = html;
         }
 
-        // Escape HTML to prevent XSS
         function escapeHtml(text) {
             const div = document.createElement('div');
             div.textContent = text;
@@ -749,13 +1047,11 @@
         }
 
         // ==================== INITIALIZATION ====================
-        // Set up everything when page loads
         document.addEventListener('DOMContentLoaded', function() {
             setTodayDates();
             loadFromStorage();
             loadAllRations();
             
-            // Add keyboard shortcut for adding
             document.getElementById('rationName').addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') {
                     e.preventDefault();
