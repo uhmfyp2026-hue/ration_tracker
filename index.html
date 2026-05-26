@@ -317,6 +317,7 @@
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   .toast i { font-size: 15px; color: #97C459; }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>
 
@@ -355,12 +356,12 @@
     <div class="add-card-title"><i class="ti ti-circle-plus"></i> Add new item</div>
     <div class="row2">
       <div class="field">
-        <label>Date</label>
-        <input type="date" id="inDate">
+        <label for="inDate">Date</label>
+        <input type="date" id="inDate" title="Select a date" placeholder="Select a date">
       </div>
       <div class="field">
-        <label>Status</label>
-        <select id="inStatus">
+        <label for="inStatus">Status</label>
+        <select id="inStatus" title="Select status">
           <option value="false">Remaining</option>
           <option value="true">Taken</option>
         </select>
@@ -371,7 +372,7 @@
         <label>Item name</label>
         <input type="text" id="inName" placeholder="e.g. Basmati Rice, Sugar, Oil…">
       </div>
-      <button class="add-btn" onmousedown="event.preventDefault()" onclick="addItem()"><i class="ti ti-plus"></i> Add</button>
+      <button class="add-btn" onclick="addItem()"><i class="ti ti-plus"></i> Add</button>
     </div>
   </div>
 
@@ -383,19 +384,32 @@
   <div class="list-head">
     <div class="section-label">Your list</div>
     <div class="filter-wrap">
-      <input type="date" id="filterDate" class="filter-input" oninput="render()">
-      <button class="clear-filter-btn" onclick="clearFilter()" title="Clear filter"><i class="ti ti-x" style="font-size:15px"></i></button>
-    </div>
-  </div>
+        <label for="filterDate" class="sr-only">Filter by date</label>
+        <input type="date" id="filterDate" class="filter-input" title="Filter by date" placeholder="Filter by date" oninput="render()">
 
   <div class="rations-list" id="rationsList"></div>
 
   <div class="share-bar">
-    <button class="share-btn" onclick="copyList()"><i class="ti ti-copy"></i> Copy list</button>
-    <button class="share-btn" onclick="shareList()"><i class="ti ti-share"></i> Share</button>
-    <button class="clear-all-btn" onclick="clearAll()" title="Delete all data"><i class="ti ti-trash"></i> Clear all</button>
-  </div>
+  <button class="share-btn" onclick="copyList()"><i class="ti ti-copy"></i> Copy list</button>
+  <button class="share-btn" onclick="shareList()"><i class="ti ti-share"></i> Share</button>
+  <button class="share-btn" onclick="openShareModal()"><i class="ti ti-qrcode"></i> QR Code</button>
+  <button class="clear-all-btn" onclick="clearAll()" title="Delete all data"><i class="ti ti-trash"></i> Clear all</button>
+</div>
 
+<!-- QR Modal -->
+<div id="qrModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:var(--surface);border-radius:var(--radius-lg);padding:28px;max-width:340px;width:100%;text-align:center;box-shadow:var(--shadow-lg);">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+      <span style="font-size:15px;font-weight:600;color:var(--text);">Scan to Open App</span>
+      <button onclick="closeShareModal()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text2);">&times;</button>
+    </div>
+    <div id="qrcode" style="display:flex;justify-content:center;margin-bottom:16px;"></div>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:16px;">Point your phone camera at the QR code to open this app</p>
+    <div style="background:var(--surface2);border-radius:var(--radius-sm);padding:10px;font-size:12px;color:var(--text2);word-break:break-all;" id="qrUrlDisplay"></div>
+    <button onclick="copyAppUrl()" style="margin-top:14px;width:100%;padding:11px;background:var(--accent);color:white;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;">
+      <i class="ti ti-copy"></i> Copy Link
+    </button>
+  </div>
 </div>
 
 <div class="toast" id="toast"><i class="ti ti-check"></i> <span id="toastMsg"></span></div>
@@ -434,10 +448,8 @@
     const taken = document.getElementById('inStatus').value === 'true';
     if (!date || !name) { showToast('Please fill in date and item name'); return; }
     rations.push({ id: uid(), date, name, taken });
-    const input = document.getElementById('inName');
     save(); render();
-    input.value = '';
-    input.focus();
+    document.getElementById('inName').value = '';
     showToast('"' + name + '" added');
   }
 
@@ -602,6 +614,36 @@
   setToday();
   load();
   render();
+  function openShareModal() {
+  const modal = document.getElementById('qrModal');
+  const qrDiv = document.getElementById('qrcode');
+  const url = window.location.href;
+  document.getElementById('qrUrlDisplay').textContent = url;
+  qrDiv.innerHTML = '';
+  new QRCode(qrDiv, {
+    text: url,
+    width: 200,
+    height: 200,
+    colorDark: '#1A1714',
+    colorLight: '#ffffff',
+    correctLevel: QRCode.CorrectLevel.H
+  });
+  modal.style.display = 'flex';
+}
+
+function closeShareModal() {
+  document.getElementById('qrModal').style.display = 'none';
+}
+
+function copyAppUrl() {
+  const url = window.location.href;
+  navigator.clipboard.writeText(url).then(() => showToast('Link copied!'));
+}
+
+window.addEventListener('click', function(e) {
+  const modal = document.getElementById('qrModal');
+  if (e.target === modal) closeShareModal();
+});
 </script>
 </body>
 </html>
