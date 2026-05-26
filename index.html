@@ -1,1064 +1,605 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>Ration Tracker · Share Your List</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-        }
-
-        body {
-            background: linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%);
-            min-height: 100vh;
-            padding: 12px;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .header {
-            text-align: center;
-            color: white;
-            margin-bottom: 20px;
-        }
-
-        .header h1 {
-            font-size: 2rem;
-            margin-bottom: 5px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-        }
-
-        .header p {
-            font-size: 0.95rem;
-            opacity: 0.9;
-        }
-
-        .storage-info {
-            background: rgba(255,255,255,0.2);
-            padding: 10px 15px;
-            border-radius: 30px;
-            margin: 15px 0;
-            color: white;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 10px;
-            backdrop-filter: blur(5px);
-        }
-
-        .storage-info i {
-            margin-right: 5px;
-        }
-
-        .share-section {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        .share-btn, .copy-btn, .clear-btn {
-            background: rgba(255,255,255,0.2);
-            border: 1px solid rgba(255,255,255,0.3);
-            color: white;
-            padding: 10px 15px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            backdrop-filter: blur(5px);
-        }
-
-        .share-btn:hover, .copy-btn:hover, .clear-btn:hover {
-            background: rgba(255,255,255,0.3);
-            transform: translateY(-2px);
-        }
-
-        .share-btn {
-            background: #25D366;
-            border-color: #25D366;
-        }
-
-        .copy-btn {
-            background: #3b5998;
-            border-color: #3b5998;
-        }
-
-        .add-section, .filter-section {
-            background: white;
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-
-        .form-group, .filter-group {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .date-input, .ration-input {
-            width: 100%;
-        }
-
-        .form-group label, .filter-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 600;
-            color: #4a5568;
-            font-size: 0.9rem;
-        }
-
-        .form-group input, .filter-group input {
-            width: 100%;
-            padding: 14px 15px;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            font-size: 16px;
-            transition: all 0.3s;
-        }
-
-        .form-group input:focus, .filter-group input:focus {
-            outline: none;
-            border-color: #feb47b;
-            box-shadow: 0 0 0 3px rgba(254, 180, 123, 0.2);
-        }
-
-        .add-btn, .filter-btn {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: all 0.3s;
-        }
-
-        .add-btn {
-            background: linear-gradient(135deg, #ff7e5f, #feb47b);
-            color: white;
-        }
-
-        .filter-btn {
-            background: #4a5568;
-            color: white;
-        }
-
-        .filter-btn.secondary {
-            background: #805ad5;
-        }
-
-        .rations-container {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 15px;
-        }
-
-        .day-card {
-            background: white;
-            border-radius: 20px;
-            padding: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            animation: slideIn 0.3s ease;
-        }
-
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .day-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid #edf2f7;
-        }
-
-        .day-title {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .day-title i {
-            font-size: 1.3rem;
-            color: #ff7e5f;
-        }
-
-        .day-title h3 {
-            font-size: 1.1rem;
-            color: #2d3748;
-        }
-
-        .day-stats {
-            font-size: 0.8rem;
-            color: #718096;
-            margin-left: 10px;
-        }
-
-        .delete-day-btn {
-            background: #fed7d7;
-            color: #c53030;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .rations-list {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .ration-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px;
-            background: #f7fafc;
-            border-radius: 12px;
-            border: 1px solid #e2e8f0;
-            transition: all 0.3s;
-        }
-
-        .ration-item:hover {
-            background: #edf2f7;
-            transform: translateX(5px);
-        }
-
-        .ration-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex: 1;
-            flex-wrap: wrap;
-        }
-
-        .status-toggle {
-            font-size: 1.5rem;
-            cursor: pointer;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            background: white;
-            border: 2px solid #e2e8f0;
-            transition: all 0.3s;
-        }
-
-        .status-toggle.taken {
-            color: #48bb78;
-            border-color: #48bb78;
-            background: #f0fff4;
-        }
-
-        .status-toggle.remaining {
-            color: #fbbf24;
-            border-color: #fbbf24;
-            background: #fffbeb;
-        }
-
-        .ration-name {
-            font-weight: 600;
-            color: #2d3748;
-            font-size: 1rem;
-        }
-
-        .status-badge {
-            font-size: 0.7rem;
-            padding: 4px 8px;
-            border-radius: 20px;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .status-badge.taken {
-            background: #c6f6d5;
-            color: #22543d;
-        }
-
-        .status-badge.remaining {
-            background: #feebc8;
-            color: #744210;
-        }
-
-        .delete-item-btn {
-            background: none;
-            border: none;
-            color: #fc8181;
-            cursor: pointer;
-            font-size: 1.1rem;
-            padding: 8px 12px;
-            border-radius: 8px;
-            transition: all 0.3s;
-        }
-
-        .delete-item-btn:hover {
-            background: #fff5f5;
-            color: #c53030;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 50px 20px;
-            background: white;
-            border-radius: 20px;
-            grid-column: 1 / -1;
-        }
-
-        .empty-state i {
-            font-size: 4rem;
-            color: #cbd5e0;
-            margin-bottom: 15px;
-        }
-
-        .empty-state p {
-            color: #718096;
-            font-size: 1.1rem;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: white;
-        }
-
-        .loading i {
-            font-size: 2.5rem;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .alert {
-            padding: 12px 15px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            animation: slideDown 0.3s ease;
-            justify-content: space-between;
-        }
-
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .alert.success {
-            background: #c6f6d5;
-            color: #22543d;
-            border-left: 5px solid #48bb78;
-        }
-
-        .alert.error {
-            background: #fed7d7;
-            color: #742a2a;
-            border-left: 5px solid #fc8181;
-        }
-
-        .alert.info {
-            background: #bee3f8;
-            color: #2c5282;
-            border-left: 5px solid #3182ce;
-        }
-
-        .close-alert {
-            cursor: pointer;
-            font-size: 1.2rem;
-            opacity: 0.7;
-        }
-
-        .close-alert:hover {
-            opacity: 1;
-        }
-
-        .quick-actions {
-            display: flex;
-            gap: 10px;
-            margin: 15px 0;
-            flex-wrap: wrap;
-        }
-
-        .quick-btn {
-            background: rgba(255,255,255,0.2);
-            border: 1px solid rgba(255,255,255,0.3);
-            color: white;
-            padding: 8px 15px;
-            border-radius: 25px;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .quick-btn:hover {
-            background: rgba(255,255,255,0.3);
-            transform: translateY(-2px);
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: 20px;
-            padding: 20px;
-            max-width: 500px;
-            width: 100%;
-            max-height: 80vh;
-            overflow: auto;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #edf2f7;
-        }
-
-        .modal-header h3 {
-            color: #2d3748;
-        }
-
-        .close-modal {
-            cursor: pointer;
-            font-size: 1.5rem;
-            color: #a0aec0;
-        }
-
-        .share-text {
-            background: #f7fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 15px;
-            margin: 15px 0;
-            font-family: monospace;
-            font-size: 0.9rem;
-            white-space: pre-wrap;
-            word-break: break-word;
-            max-height: 300px;
-            overflow: auto;
-        }
-
-        .modal-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .modal-btn {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .modal-btn.copy {
-            background: #3b5998;
-            color: white;
-        }
-
-        .modal-btn.share {
-            background: #25D366;
-            color: white;
-        }
-
-        .modal-btn.close {
-            background: #e2e8f0;
-            color: #4a5568;
-        }
-
-        @media (min-width: 768px) {
-            .rations-container {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ration Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #F7F4EE;
+    --surface: #FFFFFF;
+    --surface2: #F0EDE6;
+    --border: rgba(0,0,0,0.08);
+    --border-strong: rgba(0,0,0,0.14);
+    --text: #1A1714;
+    --text2: #6B6560;
+    --text3: #A09990;
+    --accent: #C94B2A;
+    --accent-soft: #FAF0EC;
+    --accent-mid: #EDCFC6;
+    --green: #3B6D11;
+    --green-soft: #EAF3DE;
+    --amber: #854F0B;
+    --amber-soft: #FAEEDA;
+    --red-soft: #FCEBEB;
+    --red: #A32D2D;
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 18px;
+    --shadow: 0 2px 12px rgba(0,0,0,0.07);
+    --shadow-lg: 0 8px 32px rgba(0,0,0,0.1);
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding-bottom: 60px;
+  }
+
+  /* ---- HEADER ---- */
+  .header {
+    background: var(--accent);
+    padding: 28px 20px 36px;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+    top: -60px; right: -40px;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+    bottom: -30px; left: 60px;
+  }
+  .header-inner { position: relative; z-index: 1; max-width: 600px; margin: 0 auto; }
+  .brand { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+  .brand-icon {
+    width: 38px; height: 38px; border-radius: var(--radius-sm);
+    background: rgba(255,255,255,0.2);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .brand-icon i { font-size: 20px; color: white; }
+  .brand h1 { font-family: 'DM Serif Display', serif; font-size: 22px; color: white; font-weight: 400; letter-spacing: -0.3px; }
+  .brand p { font-size: 12px; color: rgba(255,255,255,0.7); margin-top: 1px; }
+
+  .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .stat-card {
+    background: rgba(255,255,255,0.12);
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
+    backdrop-filter: blur(10px);
+  }
+  .stat-label { font-size: 11px; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+  .stat-value { font-size: 26px; font-weight: 600; color: white; line-height: 1; }
+  .stat-sub { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 3px; }
+
+  /* ---- MAIN ---- */
+  .main { max-width: 600px; margin: 0 auto; padding: 0 16px; }
+
+  /* ---- ADD CARD ---- */
+  .add-card {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    margin-top: -16px;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border);
+    margin-bottom: 20px;
+  }
+  .add-card-title {
+    font-size: 13px; font-weight: 500; color: var(--text2);
+    text-transform: uppercase; letter-spacing: 0.06em;
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .add-card-title i { font-size: 15px; color: var(--accent); }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+  .field label { font-size: 12px; color: var(--text2); display: block; margin-bottom: 4px; font-weight: 500; }
+  .field input, .field select {
+    width: 100%; padding: 10px 12px; font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    border: 1.5px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .field input:focus, .field select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(201,75,42,0.12);
+  }
+  .name-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: flex-end; }
+  .add-btn {
+    background: var(--accent); color: white;
+    border: none; border-radius: var(--radius-sm);
+    padding: 10px 18px; font-size: 14px; font-weight: 500;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer; display: flex; align-items: center; gap: 6px;
+    transition: opacity 0.15s, transform 0.1s;
+    white-space: nowrap;
+  }
+  .add-btn:hover { opacity: 0.88; }
+  .add-btn:active { transform: scale(0.97); }
+  .add-btn i { font-size: 16px; }
+
+  /* ---- QUICK PILLS ---- */
+  .quick-section { margin-bottom: 20px; }
+  .section-label {
+    font-size: 11px; font-weight: 500; color: var(--text3);
+    text-transform: uppercase; letter-spacing: 0.07em;
+    margin-bottom: 8px;
+  }
+  .pills { display: flex; gap: 6px; flex-wrap: wrap; }
+  .pill {
+    border: 1.5px solid var(--border-strong);
+    background: var(--surface);
+    border-radius: 999px; padding: 5px 14px;
+    font-size: 13px; color: var(--text2);
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .pill:hover { background: var(--accent-soft); border-color: var(--accent-mid); color: var(--accent); }
+
+  /* ---- LIST SECTION ---- */
+  .list-head {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .list-head .section-label { margin-bottom: 0; }
+  .filter-wrap { display: flex; gap: 6px; align-items: center; }
+  .filter-input {
+    font-size: 13px; padding: 6px 10px;
+    border: 1.5px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--text);
+    outline: none;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .filter-input:focus { border-color: var(--accent); }
+  .clear-filter-btn {
+    width: 32px; height: 32px;
+    border: 1.5px solid var(--border-strong);
+    background: var(--surface);
+    border-radius: var(--radius-sm);
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    color: var(--text2); transition: all 0.15s;
+  }
+  .clear-filter-btn:hover { background: var(--red-soft); color: var(--red); border-color: var(--red); }
+
+  /* ---- DAY GROUPS ---- */
+  .rations-list { display: flex; flex-direction: column; gap: 10px; }
+  .day-group {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: box-shadow 0.2s;
+  }
+  .day-group:hover { box-shadow: var(--shadow-lg); }
+
+  .day-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 16px; cursor: pointer;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.1s;
+  }
+  .day-header:hover { background: var(--surface2); }
+  .day-left { display: flex; align-items: center; gap: 12px; }
+  .day-date-block { }
+  .day-date-text { font-size: 15px; font-weight: 600; color: var(--text); }
+  .day-meta { font-size: 12px; color: var(--text2); margin-top: 2px; }
+  .progress-wrap { width: 56px; height: 4px; background: var(--surface2); border-radius: 999px; overflow: hidden; }
+  .progress-bar { height: 100%; background: var(--green); border-radius: 999px; transition: width 0.4s ease; }
+  .day-right { display: flex; align-items: center; gap: 6px; }
+  .del-day-btn {
+    width: 30px; height: 30px; border: none;
+    background: transparent; border-radius: var(--radius-sm);
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    color: var(--text3); font-size: 15px; transition: all 0.15s;
+  }
+  .del-day-btn:hover { background: var(--red-soft); color: var(--red); }
+  .chevron { font-size: 16px; color: var(--text3); transition: transform 0.2s; }
+  .day-group.collapsed .chevron { transform: rotate(-90deg); }
+  .day-group.collapsed .items-list { display: none; }
+
+  .items-list { padding: 6px 10px 10px; display: flex; flex-direction: column; gap: 2px; }
+  .item-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 8px; border-radius: var(--radius-sm);
+    transition: background 0.1s;
+  }
+  .item-row:hover { background: var(--surface2); }
+
+  .check-btn {
+    width: 26px; height: 26px; border-radius: 50%;
+    border: 2px solid var(--border-strong);
+    background: var(--surface);
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; transition: all 0.15s;
+  }
+  .check-btn.taken { background: var(--green); border-color: var(--green); }
+  .check-btn i { font-size: 14px; color: white; }
+
+  .item-name {
+    flex: 1; font-size: 14px; color: var(--text);
+    transition: color 0.15s;
+  }
+  .item-name.taken { color: var(--text3); text-decoration: line-through; }
+
+  .item-badge {
+    font-size: 11px; padding: 3px 9px; border-radius: 999px;
+    font-weight: 500; white-space: nowrap;
+  }
+  .item-badge.taken { background: var(--green-soft); color: var(--green); }
+  .item-badge.remaining { background: var(--amber-soft); color: var(--amber); }
+
+  .del-item-btn {
+    background: none; border: none; cursor: pointer;
+    font-size: 15px; color: var(--text3);
+    padding: 5px; border-radius: var(--radius-sm);
+    display: flex; align-items: center;
+    transition: all 0.15s;
+  }
+  .del-item-btn:hover { background: var(--red-soft); color: var(--red); }
+
+  /* ---- EMPTY ---- */
+  .empty-state {
+    text-align: center; padding: 48px 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+  }
+  .empty-state i { font-size: 40px; color: var(--text3); display: block; margin-bottom: 12px; }
+  .empty-state p { font-size: 15px; color: var(--text2); }
+  .empty-state small { font-size: 13px; color: var(--text3); margin-top: 4px; display: block; }
+
+  /* ---- SHARE BAR ---- */
+  .share-bar {
+    display: flex; gap: 8px; margin-top: 20px; flex-wrap: wrap;
+  }
+  .share-btn {
+    flex: 1; min-width: 120px;
+    border: 1.5px solid var(--border-strong);
+    background: var(--surface);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px; font-size: 13px; font-weight: 500;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text2); cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 7px;
+    transition: all 0.15s;
+  }
+  .share-btn:hover { background: var(--accent-soft); border-color: var(--accent-mid); color: var(--accent); }
+  .share-btn i { font-size: 16px; }
+  .clear-all-btn {
+    border: 1.5px solid var(--border-strong);
+    background: var(--surface);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px; font-size: 13px; font-weight: 500;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text3); cursor: pointer;
+    display: flex; align-items: center; gap: 7px;
+    transition: all 0.15s;
+  }
+  .clear-all-btn:hover { background: var(--red-soft); border-color: var(--red); color: var(--red); }
+
+  /* ---- TOAST ---- */
+  .toast {
+    position: fixed; bottom: 24px; left: 50%;
+    transform: translateX(-50%) translateY(12px);
+    background: #1A1714; color: white;
+    font-size: 13px; font-family: 'DM Sans', sans-serif;
+    padding: 11px 20px; border-radius: 999px;
+    display: flex; align-items: center; gap: 8px;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.2s, transform 0.2s;
+    z-index: 999; white-space: nowrap;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast i { font-size: 15px; color: #97C459; }
+</style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1><i class="fas fa-utensil-spoon"></i> Ration Tracker</h1>
-            <p>Track & share your monthly rations</p>
-        </div>
 
-        <div id="storageInfo" class="storage-info">
-            <span><i class="fas fa-database"></i> <span id="storageCount">0</span> items stored</span>
-            <button class="clear-btn" onclick="clearAllData()">
-                <i class="fas fa-trash-alt"></i> Clear All
-            </button>
-        </div>
-
-        <div class="share-section">
-            <button class="copy-btn" onclick="copyListToClipboard()">
-                <i class="fas fa-copy"></i> Copy List
-            </button>
-            <button class="share-btn" onclick="shareList()">
-                <i class="fab fa-whatsapp"></i> Share List
-            </button>
-            <button class="share-btn" onclick="showShareModal()" style="background: #1DA1F2;">
-                <i class="fas fa-share-alt"></i> More Options
-            </button>
-        </div>
-
-        <div id="alertContainer"></div>
-
-        <div class="add-section">
-            <h3 style="margin-bottom: 15px; color: #2d3748;">➕ Add New Item</h3>
-            <div class="form-group">
-                <div class="date-input">
-                    <label for="rationDate">📅 Date</label>
-                    <input type="date" id="rationDate">
-                </div>
-                <div class="ration-input">
-                    <label for="rationName">🍚 Item Name</label>
-                    <input type="text" id="rationName" placeholder="Rice, Dal, Oil, Sugar...">
-                </div>
-                <button class="add-btn" onclick="addRation()" id="addBtn">
-                    <i class="fas fa-plus-circle"></i> Add to List
-                </button>
-            </div>
-        </div>
-
-        <div class="filter-section">
-            <h3 style="margin-bottom: 15px; color: #2d3748;">🔍 Filter Options</h3>
-            <div class="filter-group">
-                <div class="date-input">
-                    <label for="filterDate">📅 Select Date</label>
-                    <input type="date" id="filterDate">
-                </div>
-                <button class="filter-btn" onclick="filterByDate()">
-                    <i class="fas fa-search"></i> Show This Date
-                </button>
-                <button class="filter-btn secondary" onclick="loadAllRations()">
-                    <i class="fas fa-calendar-alt"></i> Show All Dates
-                </button>
-            </div>
-        </div>
-
-        <div class="quick-actions">
-            <button class="quick-btn" onclick="addTodayRation('Rice')">
-                <i class="fas fa-plus"></i> Rice
-            </button>
-            <button class="quick-btn" onclick="addTodayRation('Dal')">
-                <i class="fas fa-plus"></i> Dal
-            </button>
-            <button class="quick-btn" onclick="addTodayRation('Oil')">
-                <i class="fas fa-plus"></i> Oil
-            </button>
-            <button class="quick-btn" onclick="addTodayRation('Sugar')">
-                <i class="fas fa-plus"></i> Sugar
-            </button>
-            <button class="quick-btn" onclick="addTodayRation('Wheat')">
-                <i class="fas fa-plus"></i> Wheat
-            </button>
-        </div>
-
-        <div id="rationsContainer" class="rations-container">
-            <div class="loading">
-                <i class="fas fa-spinner fa-spin"></i>
-                <p>Loading your rations...</p>
-            </div>
-        </div>
-
-        <div class="mobile-note" style="background: rgba(0,0,0,0.1); color: white; padding: 10px; border-radius: 10px; margin-top: 20px; font-size: 0.85rem; text-align: center;">
-            <i class="fas fa-share-alt"></i> Tap "Copy List" to share as text · Data saved locally
-        </div>
+<div class="header">
+  <div class="header-inner">
+    <div class="brand">
+      <div class="brand-icon"><i class="ti ti-basket"></i></div>
+      <div>
+        <h1>Ration Tracker</h1>
+        <p id="storageLabel">0 items tracked</p>
+      </div>
     </div>
-
-    <!-- Share Modal -->
-    <div id="shareModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3><i class="fas fa-share-alt"></i> Share Your Ration List</h3>
-                <span class="close-modal" onclick="closeShareModal()">&times;</span>
-            </div>
-            <div id="shareText" class="share-text"></div>
-            <div class="modal-actions">
-                <button class="modal-btn copy" onclick="copyFromModal()">
-                    <i class="fas fa-copy"></i> Copy
-                </button>
-                <button class="modal-btn share" onclick="shareFromModal()">
-                    <i class="fab fa-whatsapp"></i> Share
-                </button>
-                <button class="modal-btn close" onclick="closeShareModal()">
-                    Close
-                </button>
-            </div>
-        </div>
+    <div class="stat-row">
+      <div class="stat-card">
+        <div class="stat-label">Total</div>
+        <div class="stat-value" id="statTotal">0</div>
+        <div class="stat-sub">items</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Taken</div>
+        <div class="stat-value" id="statTaken">0</div>
+        <div class="stat-sub">collected</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Remaining</div>
+        <div class="stat-value" id="statRem">0</div>
+        <div class="stat-sub">pending</div>
+      </div>
     </div>
+  </div>
+</div>
 
-    <script>
-        // ==================== DATA LAYER ====================
-        let rations = [];
+<div class="main">
 
-        function loadFromStorage() {
-            const saved = localStorage.getItem('rationTracker');
-            if (saved) {
-                try {
-                    rations = JSON.parse(saved);
-                } catch (e) {
-                    rations = [];
-                }
-            } else {
-                const today = new Date().toISOString().split('T')[0];
-                rations = [
-                    { id: generateId(), date: today, name: 'Basmati Rice', status: false },
-                    { id: generateId(), date: today, name: 'Toor Dal', status: true },
-                ];
-                saveToStorage();
-            }
-            updateStorageInfo();
-        }
+  <div class="add-card">
+    <div class="add-card-title"><i class="ti ti-circle-plus"></i> Add new item</div>
+    <div class="row2">
+      <div class="field">
+        <label>Date</label>
+        <input type="date" id="inDate">
+      </div>
+      <div class="field">
+        <label>Status</label>
+        <select id="inStatus">
+          <option value="false">Remaining</option>
+          <option value="true">Taken</option>
+        </select>
+      </div>
+    </div>
+    <div class="name-row">
+      <div class="field">
+        <label>Item name</label>
+        <input type="text" id="inName" placeholder="e.g. Basmati Rice, Sugar, Oil…">
+      </div>
+      <button class="add-btn" onclick="addItem()"><i class="ti ti-plus"></i> Add</button>
+    </div>
+  </div>
 
-        function saveToStorage() {
-            localStorage.setItem('rationTracker', JSON.stringify(rations));
-            updateStorageInfo();
-        }
+  <div class="quick-section">
+    <div class="section-label">Quick add</div>
+    <div class="pills" id="quickPills"></div>
+  </div>
 
-        function generateId() {
-            return Date.now() + '-' + Math.random().toString(36).substr(2, 9);
-        }
+  <div class="list-head">
+    <div class="section-label">Your list</div>
+    <div class="filter-wrap">
+      <input type="date" id="filterDate" class="filter-input" oninput="render()">
+      <button class="clear-filter-btn" onclick="clearFilter()" title="Clear filter"><i class="ti ti-x" style="font-size:15px"></i></button>
+    </div>
+  </div>
 
-        function updateStorageInfo() {
-            document.getElementById('storageCount').textContent = rations.length;
-        }
+  <div class="rations-list" id="rationsList"></div>
 
-        // ==================== SHARE FUNCTIONS ====================
-        function generateFormattedList() {
-            if (rations.length === 0) {
-                return "📋 No items in your ration list yet.";
-            }
+  <div class="share-bar">
+    <button class="share-btn" onclick="copyList()"><i class="ti ti-copy"></i> Copy list</button>
+    <button class="share-btn" onclick="shareList()"><i class="ti ti-share"></i> Share</button>
+    <button class="clear-all-btn" onclick="clearAll()" title="Delete all data"><i class="ti ti-trash"></i> Clear all</button>
+  </div>
 
-            // Group by date
-            const grouped = {};
-            rations.forEach(ration => {
-                if (!grouped[ration.date]) {
-                    grouped[ration.date] = [];
-                }
-                grouped[ration.date].push(ration);
-            });
+</div>
 
-            const sortedDates = Object.keys(grouped).sort();
-            let output = "📋 *MY RATION LIST*\n";
-            output += "━━━━━━━━━━━━━━━━━━━━\n\n";
+<div class="toast" id="toast"><i class="ti ti-check"></i> <span id="toastMsg"></span></div>
 
-            for (const date of sortedDates) {
-                const dayRations = grouped[date];
-                const formattedDate = new Date(date).toLocaleDateString('en-US', {
-                    weekday: 'short',
-                    month: 'short',
-                    day: 'numeric'
-                });
-                
-                const taken = dayRations.filter(r => r.status).length;
-                const remaining = dayRations.length - taken;
-                
-                output += `📅 *${formattedDate}*\n`;
-                output += `   ✓ ${taken} taken · ○ ${remaining} remaining\n`;
-                output += `   ───────────────────\n`;
-                
-                dayRations.forEach(ration => {
-                    const icon = ration.status ? "✅" : "❌";
-                    output += `   ${icon} ${ration.name}\n`;
-                });
-                output += `\n`;
-            }
+<script>
+  const QUICK_ITEMS = ['Rice','Dal','Oil','Sugar','Wheat','Salt','Flour','Lentils','Tea','Ghee'];
+  let rations = [];
 
-            output += "━━━━━━━━━━━━━━━━━━━━\n";
-            const total = rations.length;
-            const completed = rations.filter(r => r.status).length;
-            output += `📊 *Summary*: ${completed}/${total} items taken\n`;
-            output += `📱 Generated by Ration Tracker`;
+  function load() {
+    try { rations = JSON.parse(localStorage.getItem('rationTracker_v3') || '[]'); } catch(e) { rations = []; }
+    if (!rations.length) {
+      const today = new Date().toISOString().split('T')[0];
+      rations = [
+        { id: uid(), date: today, name: 'Basmati Rice', taken: false },
+        { id: uid(), date: today, name: 'Toor Dal', taken: true },
+      ];
+      save();
+    }
+  }
 
-            return output;
-        }
+  function save() {
+    localStorage.setItem('rationTracker_v3', JSON.stringify(rations));
+  }
 
-        function generateSimpleList() {
-            if (rations.length === 0) {
-                return "No items in ration list.";
-            }
+  function uid() {
+    return Date.now() + '-' + Math.random().toString(36).substr(2, 6);
+  }
 
-            const grouped = {};
-            rations.forEach(ration => {
-                if (!grouped[ration.date]) {
-                    grouped[ration.date] = [];
-                }
-                grouped[ration.date].push(ration);
-            });
+  function setToday() {
+    document.getElementById('inDate').value = new Date().toISOString().split('T')[0];
+  }
 
-            const sortedDates = Object.keys(grouped).sort();
-            let output = "MY RATION LIST:\n\n";
+  function addItem() {
+    const date = document.getElementById('inDate').value;
+    const name = document.getElementById('inName').value.trim();
+    const taken = document.getElementById('inStatus').value === 'true';
+    if (!date || !name) { showToast('Please fill in date and item name'); return; }
+    rations.push({ id: uid(), date, name, taken });
+    save(); render();
+    document.getElementById('inName').value = '';
+    showToast('"' + name + '" added');
+  }
 
-            for (const date of sortedDates) {
-                const dayRations = grouped[date];
-                const formattedDate = new Date(date).toLocaleDateString('en-US', {
-                    month: 'short', day: 'numeric'
-                });
-                
-                output += `📅 ${formattedDate}:\n`;
-                dayRations.forEach(ration => {
-                    const status = ration.status ? "✓ TAKEN" : "○ REMAINING";
-                    output += `   ${status} - ${ration.name}\n`;
-                });
-                output += "\n";
-            }
+  function quickAdd(name) {
+    const date = document.getElementById('inDate').value;
+    if (!date) { showToast('Pick a date first'); return; }
+    rations.push({ id: uid(), date, name, taken: false });
+    save(); render();
+    showToast(name + ' added');
+  }
 
-            return output;
-        }
+  function toggle(id) {
+    const r = rations.find(x => x.id === id);
+    if (r) { r.taken = !r.taken; save(); render(); }
+  }
 
-        async function copyListToClipboard() {
-            const text = generateSimpleList();
-            try {
-                await navigator.clipboard.writeText(text);
-                showAlert("✅ List copied to clipboard! You can now paste it anywhere.", "success");
-            } catch (err) {
-                // Fallback for older browsers
-                const textarea = document.createElement('textarea');
-                textarea.value = text;
-                document.body.appendChild(textarea);
-                textarea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textarea);
-                showAlert("✅ List copied to clipboard!", "success");
-            }
-        }
+  function deleteItem(id) {
+    rations = rations.filter(x => x.id !== id);
+    save(); render(); showToast('Item removed');
+  }
 
-        async function shareList() {
-            const text = generateFormattedList();
-            
-            if (navigator.share) {
-                try {
-                    await navigator.share({
-                        title: 'My Ration List',
-                        text: text,
-                    });
-                    showAlert("✨ Shared successfully!", "success");
-                } catch (err) {
-                    if (err.name !== 'AbortError') {
-                        showAlert("Couldn't share. Try copying instead.", "error");
-                    }
-                }
-            } else {
-                // Fallback for browsers without Web Share API
-                showShareModal();
-            }
-        }
+  function deleteDay(date) {
+    const n = rations.filter(x => x.date === date).length;
+    if (!confirm('Delete all ' + n + ' items for this day?')) return;
+    rations = rations.filter(x => x.date !== date);
+    save(); render(); showToast(n + ' items removed');
+  }
 
-        function showShareModal() {
-            const modal = document.getElementById('shareModal');
-            const shareText = document.getElementById('shareText');
-            shareText.textContent = generateFormattedList();
-            modal.style.display = 'flex';
-        }
+  function clearAll() {
+    if (!confirm('Delete ALL rations? This cannot be undone.')) return;
+    rations = []; save(); render(); showToast('All data cleared');
+  }
 
-        function closeShareModal() {
-            document.getElementById('shareModal').style.display = 'none';
-        }
+  function clearFilter() {
+    document.getElementById('filterDate').value = '';
+    render();
+  }
 
-        async function copyFromModal() {
-            const text = document.getElementById('shareText').textContent;
-            try {
-                await navigator.clipboard.writeText(text);
-                showAlert("✅ Copied to clipboard!", "success");
-                closeShareModal();
-            } catch (err) {
-                showAlert("Failed to copy", "error");
-            }
-        }
+  function updateStats(list) {
+    const taken = list.filter(r => r.taken).length;
+    document.getElementById('statTotal').textContent = list.length;
+    document.getElementById('statTaken').textContent = taken;
+    document.getElementById('statRem').textContent = list.length - taken;
+    document.getElementById('storageLabel').textContent = rations.length + ' item' + (rations.length !== 1 ? 's' : '') + ' tracked';
+  }
 
-        async function shareFromModal() {
-            const text = document.getElementById('shareText').textContent;
-            if (navigator.share) {
-                try {
-                    await navigator.share({
-                        title: 'My Ration List',
-                        text: text,
-                    });
-                    closeShareModal();
-                    showAlert("✨ Shared!", "success");
-                } catch (err) {
-                    if (err.name !== 'AbortError') {
-                        showAlert("Sharing failed", "error");
-                    }
-                }
-            } else {
-                await copyFromModal();
-                showAlert("📋 Copied! You can now paste in WhatsApp or other apps", "info");
-            }
-        }
+  function formatDate(d) {
+    return new Date(d + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+  }
 
-        // ==================== UI FUNCTIONS ====================
-        function setTodayDates() {
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('rationDate').value = today;
-            document.getElementById('filterDate').value = today;
-        }
+  function esc(s) {
+    const d = document.createElement('div'); d.textContent = s; return d.innerHTML;
+  }
 
-        function showAlert(message, type = 'success') {
-            const container = document.getElementById('alertContainer');
-            const icons = {
-                success: 'fa-check-circle',
-                error: 'fa-exclamation-circle',
-                info: 'fa-info-circle'
-            };
-            
-            container.innerHTML = `
-                <div class="alert ${type}">
-                    <i class="fas ${icons[type]}"></i>
-                    <span>${message}</span>
-                    <span class="close-alert" onclick="this.parentElement.remove()">&times;</span>
-                </div>
-            `;
-            
-            setTimeout(() => {
-                const alert = document.querySelector('.alert');
-                if (alert) alert.remove();
-            }, 4000);
-        }
+  function render() {
+    const fDate = document.getElementById('filterDate').value;
+    const list = fDate ? rations.filter(r => r.date === fDate) : rations;
+    updateStats(list);
 
-        function addRation() {
-            const date = document.getElementById('rationDate').value;
-            const name = document.getElementById('rationName').value.trim();
+    const grouped = {};
+    list.forEach(r => { (grouped[r.date] = grouped[r.date] || []).push(r); });
+    const dates = Object.keys(grouped).sort().reverse();
 
-            if (!date) {
-                showAlert('Please select a date', 'error');
-                return;
-            }
+    const el = document.getElementById('rationsList');
+    if (!dates.length) {
+      el.innerHTML = '<div class="empty-state"><i class="ti ti-clipboard-list"></i><p>No rations found</p><small>Add your first item using the form above</small></div>';
+      return;
+    }
 
-            if (!name) {
-                showAlert('Please enter an item name', 'error');
-                return;
-            }
+    el.innerHTML = dates.map(date => {
+      const items = grouped[date];
+      const taken = items.filter(r => r.taken).length;
+      const pct = items.length ? Math.round(taken / items.length * 100) : 0;
 
-            const newRation = {
-                id: generateId(),
-                date: date,
-                name: name,
-                status: false
-            };
+      const rows = [...items].sort((a, b) => a.taken - b.taken).map(r => `
+        <div class="item-row">
+          <button class="check-btn ${r.taken ? 'taken' : ''}" onclick="toggle('${r.id}')" aria-label="${r.taken ? 'Mark as remaining' : 'Mark as taken'}">
+            ${r.taken ? '<i class="ti ti-check"></i>' : ''}
+          </button>
+          <span class="item-name ${r.taken ? 'taken' : ''}">${esc(r.name)}</span>
+          <span class="item-badge ${r.taken ? 'taken' : 'remaining'}">${r.taken ? 'Taken' : 'Remaining'}</span>
+          <button class="del-item-btn" onclick="deleteItem('${r.id}')" aria-label="Delete ${esc(r.name)}"><i class="ti ti-x"></i></button>
+        </div>`).join('');
 
-            rations.push(newRation);
-            saveToStorage();
-            
-            document.getElementById('rationName').value = '';
-            showAlert(`✅ "${name}" added!`);
-            loadAllRations();
-        }
+      return `
+        <div class="day-group">
+          <div class="day-header" onclick="toggleGroup(this.parentElement)">
+            <div class="day-left">
+              <div class="day-date-block">
+                <div class="day-date-text">${formatDate(date)}</div>
+                <div class="day-meta">${taken} of ${items.length} taken</div>
+              </div>
+              <div class="progress-wrap">
+                <div class="progress-bar" style="width:${pct}%"></div>
+              </div>
+            </div>
+            <div class="day-right">
+              <button class="del-day-btn" onclick="event.stopPropagation();deleteDay('${date}')" aria-label="Delete day"><i class="ti ti-trash"></i></button>
+              <i class="ti ti-chevron-down chevron"></i>
+            </div>
+          </div>
+          <div class="items-list">${rows}</div>
+        </div>`;
+    }).join('');
+  }
 
-        function addTodayRation(item) {
-            document.getElementById('rationName').value = item;
-            addRation();
-        }
+  function toggleGroup(el) { el.classList.toggle('collapsed'); }
 
-        function toggleStatus(id) {
-            const ration = rations.find(r => r.id === id);
-            if (ration) {
-                ration.status = !ration.status;
-                saveToStorage();
-                loadAllRations();
-            }
-        }
+  function buildText(formatted) {
+    if (!rations.length) return 'No items in ration list.';
+    const grouped = {};
+    rations.forEach(r => { (grouped[r.date] = grouped[r.date] || []).push(r); });
+    const dates = Object.keys(grouped).sort();
+    let out = formatted ? '📋 *MY RATION LIST*\n━━━━━━━━━━━━━━━━━\n\n' : 'MY RATION LIST:\n\n';
+    for (const d of dates) {
+      const items = grouped[d];
+      const taken = items.filter(r => r.taken).length;
+      out += (formatted ? '📅 ' : '') + formatDate(d) + ' — ' + taken + '/' + items.length + ' taken\n';
+      items.forEach(r => { out += '   ' + (r.taken ? '✅' : '❌') + ' ' + r.name + '\n'; });
+      out += '\n';
+    }
+    if (formatted) {
+      const t = rations.length, tk = rations.filter(r => r.taken).length;
+      out += '━━━━━━━━━━━━━━━━━\n📊 Total: ' + tk + '/' + t + ' taken';
+    }
+    return out;
+  }
 
-        function deleteRation(id) {
-            if (confirm('Remove this item?')) {
-                rations = rations.filter(r => r.id !== id);
-                saveToStorage();
-                showAlert('Item removed');
-                loadAllRations();
-            }
-        }
+  async function copyList() {
+    const text = buildText(false);
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch(e) {
+      const ta = document.createElement('textarea');
+      ta.value = text; document.body.appendChild(ta); ta.select();
+      document.execCommand('copy'); document.body.removeChild(ta);
+    }
+    showToast('List copied to clipboard');
+  }
 
-        function deleteDay(date) {
-            const count = rations.filter(r => r.date === date).length;
-            if (confirm(`Delete all ${count} items for this day?`)) {
-                rations = rations.filter(r => r.date !== date);
-                saveToStorage();
-                showAlert(`🗑️ Day deleted`);
-                loadAllRations();
-            }
-        }
+  async function shareList() {
+    const text = buildText(true);
+    if (navigator.share) {
+      try { await navigator.share({ title: 'My Ration List', text }); return; }
+      catch(e) { if (e.name === 'AbortError') return; }
+    }
+    copyList();
+  }
 
-        function clearAllData() {
-            if (confirm('⚠️ Delete ALL rations? This cannot be undone!')) {
-                rations = [];
-                saveToStorage();
-                showAlert('All data cleared', 'error');
-                loadAllRations();
-            }
-        }
+  function showToast(msg, dur = 2600) {
+    const t = document.getElementById('toast');
+    document.getElementById('toastMsg').textContent = msg;
+    t.classList.add('show');
+    clearTimeout(t._tid);
+    t._tid = setTimeout(() => t.classList.remove('show'), dur);
+  }
 
-        function filterByDate() {
-            const date = document.getElementById('filterDate').value;
-            if (!date) {
-                showAlert('Please select a date', 'error');
-                return;
-            }
+  document.getElementById('inName').addEventListener('keydown', e => { if (e.key === 'Enter') addItem(); });
+  document.getElementById('quickPills').innerHTML = QUICK_ITEMS.map(i =>
+    `<button class="pill" onclick="quickAdd('${i}')">${i}</button>`).join('');
 
-            const filtered = rations.filter(r => r.date === date);
-            displayRations(filtered, `Showing: ${formatDate(date)}`);
-        }
-
-        function loadAllRations() {
-            displayRations(rations, 'All Dates');
-        }
-
-        function formatDate(dateString) {
-            const options = { weekday: 'short', month: 'short', day: 'numeric' };
-            return new Date(dateString).toLocaleDateString('en-US', options);
-        }
-
-        function displayRations(rationsToShow, title = '') {
-            const container = document.getElementById('rationsContainer');
-            
-            if (!rationsToShow || rationsToShow.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-clipboard-list"></i>
-                        <p>No rations found</p>
-                        <p style="font-size: 0.9rem; margin-top: 10px;">Add your first item using the form above</p>
-                    </div>
-                `;
-                return;
-            }
-
-            const grouped = {};
-            rationsToShow.forEach(ration => {
-                if (!grouped[ration.date]) {
-                    grouped[ration.date] = [];
-                }
-                grouped[ration.date].push(ration);
-            });
-
-            const sortedDates = Object.keys(grouped).sort().reverse();
-            let html = '';
-
-            for (const date of sortedDates) {
-                const dayRations = grouped[date];
-                const takenCount = dayRations.filter(r => r.status).length;
-                const totalCount = dayRations.length;
-
-                html += `
-                    <div class="day-card">
-                        <div class="day-header">
-                            <div class="day-title">
-                                <i class="fas fa-calendar-day"></i>
-                                <div>
-                                    <h3>${formatDate(date)}</h3>
-                                    <span class="day-stats">${takenCount}/${totalCount} taken</span>
-                                </div>
-                            </div>
-                            <button class="delete-day-btn" onclick="deleteDay('${date}')">
-                                <i class="fas fa-trash-alt"></i> Day
-                            </button>
-                        </div>
-                        <div class="rations-list">
-                `;
-
-                const sortedRations = [...dayRations].sort((a, b) => a.status - b.status);
-
-                for (const ration of sortedRations) {
-                    const statusClass = ration.status ? 'taken' : 'remaining';
-                    const statusIcon = ration.status ? 'fa-check-circle' : 'fa-times-circle';
-                    const statusText = ration.status ? 'Taken' : 'Remaining';
-
-                    html += `
-                        <div class="ration-item">
-                            <div class="ration-info">
-                                <span class="status-toggle ${statusClass}" onclick="toggleStatus('${ration.id}')">
-                                    <i class="fas ${statusIcon}"></i>
-                                </span>
-                                <span class="ration-name">${escapeHtml(ration.name)}</span>
-                                <span class="status-badge ${statusClass}">${statusText}</span>
-                            </div>
-                            <button class="delete-item-btn" onclick="deleteRation('${ration.id}')">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                    `;
-                }
-
-                html += `</div></div>`;
-            }
-
-            container.innerHTML = html;
-        }
-
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        // ==================== INITIALIZATION ====================
-        document.addEventListener('DOMContentLoaded', function() {
-            setTodayDates();
-            loadFromStorage();
-            loadAllRations();
-            
-            document.getElementById('rationName').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    addRation();
-                }
-            });
-        });
-    </script>
+  setToday();
+  load();
+  render();
+</script>
 </body>
 </html>
